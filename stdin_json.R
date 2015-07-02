@@ -43,37 +43,42 @@ while (!stop){
     
     sum_var=0
     #if(FALSE){
-      for(i in 1:names(comp)){
+      for(i in 1:length(comp)){
         data<-comp[[i]]
         #print(data)
-        M <- matrix (data [,'M'], ncol=1 )
-        Cov <- matrix (data [,'M']+ data [,'U'], ncol=1 )
+        M <- matrix (as.numeric(data [,'M']), ncol=1 )
+        #print(M)
+        Cov <- matrix (as.numeric(data [,'M'])+ as.numeric(data [,'U']), ncol=1 )
+        #print(Cov)
         
-        if ((var((data[,'M'])/(data[,'M']+data[,'U'])))==0)
+        if ((var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))==0)
         {
-          df1<-data.frame(region,i,var((data[,'M'])/(data[,'M']+data[,'U'])),var((data[,'M'])/(data[,'M']+data[,'U'])))
-          sum_var=sum_var+var((data[,'M'])/(data[,'M']+data[,'U']))
+          df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
+                          var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))
+          sum_var=sum_var+var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U'])))
         }
         
-        if ((var((data[,'M'])/(data[,'M']+data[,'U'])))!=0) {
+        if ((var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))!=0) {
           
           BStmp <- BSseq (chr = c(data[,'chr']), pos = data [,'start'], M=M, Cov=Cov)
           BStemp<-BSmooth(BStmp, ns=10, h=300, maxGap=3000, keep.se=TRUE, verbose=FALSE)
           
-          cover=data[,'M']+data[,'U']
+          cover=as.numeric(data [,'M'])+ as.numeric(data [,'U'])
           print(summary(getMeth(BStemp)))
           #print(var(getMeth(BStemp)))
           
-          if (((var(getMeth(BStemp)))/(var((data[,'M'])/(data[,'M']+data[,'U']))))>=1.45)
+          if (((var(getMeth(BStemp)))/(var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U'])))))>=1.45)
           {
-            df1<-data.frame(region,i,var((data[,'M'])/(data[,'M']+data[,'U'])),var((data[,'M'])/(data[,'M']+data[,'U'])))
-            sum_var=sum_var+var((data[,'M'])/(data[,'M']+data[,'U']))
+            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
+                            var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))
+            sum_var=sum_var+var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U'])))
           }
           
           else
           {
             sum_var=sum_var+var(df1[2])
-            df1<-data.frame(region,i,var((data[,'M'])/(data[,'M']+data[,'U'])),var(getMeth(BStemp)))
+            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
+                            var(getMeth(BStemp)))
             sum_var=sum_var+var(getMeth(BStemp))
           }
           
@@ -136,12 +141,13 @@ while (!stop){
     
     print(num)
     
-    print(sum_var)
-    print('Region:',region)
-    print('Result 1, mean of variance different replicates:',sum_var/length(comp))
+    #print(sum_var)
+    #print('Region:',as.numeric(region))
+    print('Result 1, mean of variance different replicates:')
+    print(sum_var/length(comp))
     
     get=matrix(c(num), nrow=3)
-    print(get)
+    #print(get)
     
     va<-c()
     
@@ -149,7 +155,8 @@ while (!stop){
       va<-c(va,var(get[,go]))
     }
     
-    print('Result 2, mean of variance of different CpGs accorss replicates:',mean(va))
+    print('Result 2, mean of variance of different CpGs accorss replicates:')
+    print(mean(va))
     
   } else {
     stop <- TRUE
