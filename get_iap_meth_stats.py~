@@ -1,3 +1,19 @@
+#Usage notes: 
+#First argument is name of the file containing all the regions, from which random ones can be selected
+#Second argument is the name of the file containing known ragged regions. If you only want random ones, set this to NONE
+#Third argument is a comma-separated list of bedgraph files containing methylation data for replicates
+#Fourth argument is the number of random regions that should be selected. Set to 0 to take all of the regions in the argument 1 file
+#Fifth argumnet is the minimum number of CpG sites that
+
+'''
+allRegionsFilename = sys.argv[1]
+knownRegionsFilename = sys.argv[2]
+bedgraphFilenames = sys.argv[3].split(',')
+numRandRegions = int(sys.argv[4])
+minCpGs = int(sys.argv[5])
+minRegionLength = int(sys.argv[6])
+'''
+
 import sys, os, linecache, subprocess, re, time, json, logging
 import numpy as np
 import numpy.random as rand
@@ -309,7 +325,7 @@ if keepLog in ['F', 'False', 'FALSE']:
 else:
 	logFile = open(keepLog, 'wa')
 '''
-
+'''
 x = []
 y = []
 
@@ -333,7 +349,7 @@ plt.show()
 
 print("HERE HERE HERE")
 
-
+'''
 
 
 

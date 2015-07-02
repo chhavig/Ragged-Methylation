@@ -47,3 +47,5 @@ iap_whole_genome.merged.bed
 
 #Temporary files created by gedit
 get_iap_meth_stats.py~
+stdin_json.R~
+stream_meth_data_in.R~
