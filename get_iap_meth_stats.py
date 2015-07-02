@@ -18,7 +18,7 @@ minRegionLength = int(sys.argv[6])
 import sys, os, linecache, subprocess, re, time, json, logging
 import numpy as np
 import numpy.random as rand
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from math import *
 
 
