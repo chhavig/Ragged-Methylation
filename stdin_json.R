@@ -155,9 +155,9 @@ while (!stop){
     
     #print(sum_var)
     print('Region:')
-    print(as.numeric(region))
+    print((region))
     print('Result 1, mean of variance different replicates:')
-    print(sum_var/length(comp))
+    print(mean(sum_var))
     
     get=matrix(c(num), nrow=3)
     #print(get)
@@ -170,6 +170,13 @@ while (!stop){
     
     print('Result 2, mean of variance of different CpGs across replicates:')
     print(mean(va))
+    
+    df1<-data.frame(region,mean(sum_var),mean(va))
+    
+    write.table(df1, file = 'results.csv', append = TRUE, quote = TRUE, sep = " , ",
+                eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+                col.names = FALSE, qmethod = c("escape", "double"),
+                fileEncoding = "")
     
   } else {
     stop <- TRUE
