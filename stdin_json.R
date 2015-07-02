@@ -61,7 +61,7 @@ while (!stop){
         
         if ((var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))!=0) {
           
-          BStmp <- BSseq (chr = c(data[,'chr']), pos = data [,'start'], M=M, Cov=Cov)
+          BStmp <- BSseq (chr = c(data[,'chr']), pos = as.numeric(data [,'start']), M=M, Cov=Cov)
           BStemp<-BSmooth(BStmp, ns=10, h=300, maxGap=3000, keep.se=TRUE, verbose=FALSE)
           
           cover=as.numeric(data [,'M'])+ as.numeric(data [,'U'])
