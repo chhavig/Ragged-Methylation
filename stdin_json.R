@@ -168,7 +168,7 @@ while (!stop){
       va<-c(va,var(get[,go]))
     }
     
-    print('Result 2, mean of variance of different CpGs accorss replicates:')
+    print('Result 2, mean of variance of different CpGs across replicates:')
     print(mean(va))
     
   } else {
