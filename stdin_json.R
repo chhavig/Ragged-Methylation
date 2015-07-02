@@ -20,6 +20,8 @@ while (!stop){
     #print(x)
     comp=list()
     sum_var=0
+    region<-0
+    status<-0
     for(i in names(d)){
       if(i=='REGION_INFO'){
         region<-c(strsplit(x," "))
@@ -34,8 +36,17 @@ while (!stop){
           #print(strsplit (d[[i]][j], " ")[[1]])
           rbind(DF,c(strsplit (d[[i]][j], " ")[[1]]))->DF
         }
-        #print (DF)
+        
         colnames(DF) <- c('chr', 'start', 'end', 'score', 'M', 'U')
+        #print(DF)
+        #DF[,'start']<-as.numeric(DF[,'start'])
+        #print(DF[1,'start']+DF[2,'start'])
+        #print(DF)
+        #DF$end<-as.numeric(DF$end)
+        #DF$score<-as.numeric(DF$score)
+        #DF$M<-as.numeric(DF$M)
+        #DF$U<-as.numeric(DF$U)
+        #print (DF)
         comp[[i]]<-DF
       }
     }
@@ -49,7 +60,7 @@ while (!stop){
         #print(data)
         M <- matrix (as.numeric(data [,'M']), ncol=1 )
         #print(M)
-        Cov <- matrix (as.numeric(data [,'M'])+ as.numeric(data [,'U']), ncol=1 )
+        Cov <- matrix (as.numeric(data [,'M'])+as.numeric(data [,'U']), ncol=1 )
         #print(Cov)
         
         if ((var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))==0)
@@ -66,19 +77,19 @@ while (!stop){
           
           cover=as.numeric(data [,'M'])+ as.numeric(data [,'U'])
           print(summary(getMeth(BStemp)))
-          #print(var(getMeth(BStemp)))
+          print(var(getMeth(BStemp)))
           
-          if (((var(getMeth(BStemp)))/(var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U'])))))>=1.45)
+          if (((var(getMeth(BStemp)))/(var((as.numeric(data [,'M']))/(cover))))>=1.45)
           {
-            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
-                            var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))
-            sum_var=sum_var+var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U'])))
+            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(cover)),
+                            var((as.numeric(data [,'M']))/(cover)))
+            sum_var=sum_var+var((as.numeric(data [,'M']))/(cover))
           }
           
           else
           {
             #sum_var=sum_var+var(df1[2])
-            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
+            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(cover)),
                             var(getMeth(BStemp)))
             sum_var=sum_var+var(getMeth(BStemp))
           }
@@ -116,7 +127,7 @@ while (!stop){
           if(chck==search){
             #print('Yep')
             present=TRUE
-            n<-as.numeric(df3[l,'score'])
+            n<-(df3[l,'score'])
             #print(n)
             break;
           }
@@ -143,7 +154,8 @@ while (!stop){
     print(num)
     
     #print(sum_var)
-    #print('Region:',as.numeric(region))
+    print('Region:')
+    print(as.numeric(region))
     print('Result 1, mean of variance different replicates:')
     print(sum_var/length(comp))
     
