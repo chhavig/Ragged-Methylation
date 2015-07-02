@@ -21,6 +21,9 @@ import numpy.random as rand
 #import matplotlib.pyplot as plt
 from math import *
 
+def lineSplit(lineString):
+	return re.split(re.compile("\s+"), lineString)
+
 
 class StreamToLogger(object):
    """
@@ -37,12 +40,40 @@ class StreamToLogger(object):
 
 def bisectionSearch(fileNameToSearch, firstLine, lastLine, regionStart, regionEnd):
 
-	firstLineList = linecache.getline(fileNameToSearch, firstLine).strip().split('\t')
-	lastLineList = linecache.getline(fileNameToSearch, lastLine).strip().split('\t')
+	def lineSplit(lineString):
+		return re.split(re.compile("\s+"), lineString)
 
-	if ((regionEnd < int(firstLineList[1])) | (regionStart > int(lastLineList[1]))):
+	#If firstLine or lastLine are non-positive, return None
+	if firstLine <= 0 or lastLine <= 0:
+		print("One of the boundary line numbers has a non-positive value.")
+		return None
+
+	#If lastLine is greater than or equal to firstLine, return None
+	if lastLine <= firstLine:
+		print("The last boundary line number is less than or equal to the first boundary line number")
+		return None
+	
+	firstLineList = lineSplit(linecache.getline(fileNameToSearch, firstLine).strip())
+	lastLineList = lineSplit(linecache.getline(fileNameToSearch, lastLine).strip())
+
+	#An empty file to search will cause a None return. This is also caused is you try and get a line that does not exist in the file.
+	if firstLineList == [''] or lastLineList == ['']:
+		print("The bedgraph file %s appears to be empty. This may be caused by boundary line numbers that are greater than the number of lines present in the file." % fileNameToSearch)
+		return None
+
+	if regionStart <= 0 or regionEnd <= 0:
+		print("Either the region start or end are non-positive.")
+		return None
+
+	if regionEnd <= regionStart:
+		print("The region end is less than or equal to the region start.")
+		return None
+
+	#If the end of the region is before the first boundary line or the start of the region is after the last boundary line, return None
+	if ((regionEnd < int(firstLineList[1])) or (regionStart > int(lastLineList[1]))):
 		print("The selected region has no overlap with the given methylation file. Exiting.")
 		return None
+
 	firstCpGLine = 0
 	lastCpGLine = 0
 	if regionStart <= int(firstLineList[1]):
@@ -56,7 +87,7 @@ def bisectionSearch(fileNameToSearch, firstLine, lastLine, regionStart, regionEn
 		midLine = int(floor((topLine+bottomLine)/2))
 
 		while ((bottomLine != topLine+1) & (alreadyFound == False)):
-			line = linecache.getline(fileNameToSearch, midLine).strip().split('\t')
+			line = lineSplit(linecache.getline(fileNameToSearch, midLine).strip())
 
 			if int(line[1]) > regionStart:
 				#Taking top half
@@ -84,7 +115,7 @@ def bisectionSearch(fileNameToSearch, firstLine, lastLine, regionStart, regionEn
 		bottomLine = lastLine
 		midLine = int(floor((topLine+bottomLine)/2))
 		while ((bottomLine != topLine+1) & (alreadyFound == False)):
-			line = linecache.getline(fileNameToSearch, midLine).strip().split('\t')
+			line = lineSplit(linecache.getline(fileNameToSearch, midLine).strip())
 
 			if int(line[1]) > regionEnd:
 				#Taking top half
@@ -105,7 +136,7 @@ def bisectionSearch(fileNameToSearch, firstLine, lastLine, regionStart, regionEn
 
 	return [firstCpGLine, lastCpGLine]
 
-def getCpGs(fileNameToSearch, regionChr, regionStart, regionEnd, bedgraphFilename, minCpGs):
+def getCpGs(regionChr, regionStart, regionEnd, bedgraphFilename):
 	global chrDictByRep
 	if regionChr in chrDictByRep[bedgraphFilename].keys():
 		print("Chromosome locations already in dictionary")
@@ -128,7 +159,7 @@ def getCpGs(fileNameToSearch, regionChr, regionStart, regionEnd, bedgraphFilenam
 		os.close(nullFds[0])
 		os.close(nullFds[1])
 	print("Searching for CpGs")
-	searchResults = bisectionSearch(fileNameToSearch, firstLine, lastLine, regionStart, regionEnd)
+	searchResults = bisectionSearch(bedgraphFilename, firstLine, lastLine, regionStart, regionEnd)
 	if searchResults != None:
 		firstCpGLine, lastCpGLine = searchResults
 	else:
@@ -139,16 +170,12 @@ def getCpGs(fileNameToSearch, regionChr, regionStart, regionEnd, bedgraphFilenam
 
 	n = firstCpGLine
 	while n <= lastCpGLine:
-		line = ' '.join(linecache.getline(fileNameToSearch, n).strip().split('\t'))
+		line = ' '.join(lineSplit(linecache.getline(bedgraphFilename, n).strip()))
 		outputMethList.append(line)
 		n+=1
 	#Found all CpGs
-	numCpGs = len(outputMethList)
-	if numCpGs < minCpGs:
-		print("Warning: this region does not have enough CpGs to be smoothed")
-		return None
-	else:
-		return outputMethList
+	
+	return outputMethList
 
 class Region:
 
@@ -161,6 +188,7 @@ class Region:
 		print("Getting methylation data for region: %s %s %d %d" % (self.ID, self.chr, self.start, self.end))
 		#Each key in this dictionary is a biological replicate, and each value is a list of CpG sites with associated methylation data
 		self.methylationDict = self.getMethylationDict(replicateList, minCpGs)
+
 		#Each key is a biological replicate, and each value is the variance of the smoothed methylation levels in that replicate
 		self.withinRepVarSmoothDict = self.getWithinRepVar()
 		self.withinRepMeanVar = np.mean(self.withinRepVarSmoothDict.values())
@@ -176,21 +204,25 @@ class Region:
 		methylationDict = dict()
 		for rep in replicateList:
 			print("Getting data from replicate %s" % rep)
-			methList = getCpGs(rep, self.chr, self.start, self.end, rep, minCpGs)
+			methList = getCpGs(self.chr, self.start, self.end, rep)
 			if methList != None:
 				methylationDict[rep] = methList
 			else:
 				print("There was a problem obtaining methylation data for this replicate. This replicate has not been included in the methylation data for this region.")
-				continue
+				methylationDict = None
 		return methylationDict
 
 	def getWithinRepVar(self):
+		if self.methylationDict == None:
+			return None
 		varByRepDict = dict()
 		for rep in self.methylationDict.keys():
 			varByRepDict[rep] = np.std([float(l.split(' ')[3]) for l in self.methylationDict[rep]])**2
 		return varByRepDict
 
 	def getBetweenRepVar(self):
+		if self.methylationDict == None:
+			return None
 		cpgPosValDict = dict()
 		for rep in self.methylationDict.keys():
 			cpgPosValDict[rep] = {int(l.split(' ')[1]):float(l.split(' ')[3]) for l in self.methylationDict[rep]}
@@ -207,8 +239,7 @@ class Region:
 
 
 def getLineCheckLength(regionFileName, lineNumber, minRegionLength):
-	line = linecache.getline(regionFileName, lineNumber).strip()
-	regionPropList = re.split(re.compile('\s+'), line)
+	regionPropList = lineSplit(linecache.getline(regionFileName, lineNumber).strip())
 	if int(regionPropList[2])-int(regionPropList[1]) < minRegionLength:
 		#Region too short
 		return None
@@ -217,7 +248,8 @@ def getLineCheckLength(regionFileName, lineNumber, minRegionLength):
 
 def checkCpGNum(methylationDict, minCpGs):
 	for rep in methylationDict.keys():
-		if False:
+		if len(methylationDict[rep]) < minCpGs:
+			print("Not enough CpGs in replicate %s" % rep)
 			return None
 		else:
 			return 1
