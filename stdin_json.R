@@ -77,7 +77,7 @@ while (!stop){
           
           else
           {
-            sum_var=sum_var+var(df1[2])
+            #sum_var=sum_var+var(df1[2])
             df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
                             var(getMeth(BStemp)))
             sum_var=sum_var+var(getMeth(BStemp))
