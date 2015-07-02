@@ -309,7 +309,7 @@ if keepLog in ['F', 'False', 'FALSE']:
 else:
 	logFile = open(keepLog, 'wa')
 '''
-
+'''
 x = []
 y = []
 
@@ -333,7 +333,7 @@ plt.show()
 
 print("HERE HERE HERE")
 
-
+'''
 
 
 
