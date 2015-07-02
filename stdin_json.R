@@ -63,35 +63,35 @@ while (!stop){
         Cov <- matrix (as.numeric(data [,'M'])+as.numeric(data [,'U']), ncol=1 )
         #print(Cov)
         
-        if ((var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))==0)
+        cover=as.numeric(data [,'M'])+ as.numeric(data [,'U'])
+        sc=((as.numeric(data [,'M']))/(cover))*100
+        
+        if ((var(sc))==0)
         {
-          df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))),
-                          var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))
-          sum_var=sum_var+var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U'])))
+          df1<-data.frame(region,i,var(sc),var(sc))
+          sum_var=sum_var+var(sc)
         }
         
-        if ((var((as.numeric(data [,'M']))/(as.numeric(data [,'M'])+ as.numeric(data [,'U']))))!=0) {
+        if ((var(sc))!=0) {
           
           BStmp <- BSseq (chr = c(data[,'chr']), pos = as.numeric(data [,'start']), M=M, Cov=Cov)
           BStemp<-BSmooth(BStmp, ns=10, h=300, maxGap=3000, keep.se=TRUE, verbose=FALSE)
           
-          cover=as.numeric(data [,'M'])+ as.numeric(data [,'U'])
-          print(summary(getMeth(BStemp)))
-          print(var(getMeth(BStemp)))
           
-          if (((var(getMeth(BStemp)))/(var((as.numeric(data [,'M']))/(cover))))>=1.45)
+          print(summary(getMeth(BStemp)))
+          print(var(getMeth(BStemp)*100))
+          
+          if (((var(getMeth(BStemp)*100))/(var(sc)))>=1.45)
           {
-            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(cover)),
-                            var((as.numeric(data [,'M']))/(cover)))
-            sum_var=sum_var+var((as.numeric(data [,'M']))/(cover))
+            df1<-data.frame(region,i,var(sc),var(sc))
+            sum_var=sum_var+var(sc)
           }
           
           else
           {
             #sum_var=sum_var+var(df1[2])
-            df1<-data.frame(region,i,var((as.numeric(data [,'M']))/(cover)),
-                            var(getMeth(BStemp)))
-            sum_var=sum_var+var(getMeth(BStemp))
+            df1<-data.frame(region,i,var(sc),var(getMeth(BStemp)*100))
+            sum_var=sum_var+var(getMeth(BStemp)*100)
           }
           
         }
