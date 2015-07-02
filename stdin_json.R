@@ -1,4 +1,5 @@
 library(jsonlite)
+library(bsseq)
 
 f <- file("stdin", "r")
 
