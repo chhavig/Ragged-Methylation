@@ -15,8 +15,8 @@ while (!stop){
 
 		for (i in names(dataFrameIn)){
 			if(i == 'REGION_INFO'){
-				cat("Found region information\n")
 				region <- c(strsplit(dataFrameIn[[i]]," ")[[1]])
+				cat("Found region information",dataFrameIn[[i]],'\n')
 			}
 			else if (i == 'STATUS'){
 				cat("Found status\n")
@@ -30,34 +30,29 @@ while (!stop){
 				}
 
 			colnames(methDataFrame) <- c('chr', 'start', 'end', 'score', 'M', 'U')
-			newDF <- NULL
-			newDF <- cbind(newDF, methDataFrame[,'chr'])
-			newDF <- cbind(newDF, as.numeric(methDataFrame[,'start']))
-			colnames(newDF) <- c('chr','start')
-			print(newDF)
-
-			#print(methDataFrame)
-			#print(methDataFrame[,'start'])
-			#print(typeof(methDataFrame[,'start']))
-			#tmp <- as.numeric(methDataFrame[,'start'])
-			#print(typeof(tmp))
-			#methDataFrame[,'start'] <- tmp
-			#print(typeof(methDataFrame[,'start']))
-			#print(methDataFrame[,'start'])
-			#methDataFrame$end <- as.numeric(methDataFrame$end)
-			#methDataFrame$score <- as.numeric(methDataFrame$score)
-			#methDataFrame$M <- as.numeric(methDataFrame$M)
-			#methDataFrame$U <- as.numeric(methDataFrame$U)
-			
-			#print(methDataFrame)
+			####################################################
+			#At the moment methDataFrame is a matrix
+			methDataFrame <- data.frame(methDataFrame)
+			#Now it's a data frame
+			for (n in colnames(methDataFrame)){
+				if (n != 'chr'){
+					methDataFrame[,n] <- as.numeric(methDataFrame[,n])
+				} else {
+					methDataFrame[,n] <- as.character(methDataFrame[,n])
+				}
+			}
+			#Now all the columns are the right type
+			#####################################################
 			methDataByRep[[i]] <- methDataFrame
 			}
 		}
+
+		#print(methDataByRep)
 	}
 	else {
 		stop <- TRUE
 	}
 
-	print(length(methDataByRep))
+	
 }
 
