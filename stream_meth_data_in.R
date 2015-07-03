@@ -30,7 +30,7 @@ while (!stop){
 				}
 
 			colnames(methDataFrame) <- c('chr', 'start', 'end', 'score', 'M', 'U')
-			####################################################
+			#####################################################
 			#At the moment methDataFrame is a matrix
 			methDataFrame <- data.frame(methDataFrame)
 			#Now it's a data frame
@@ -42,7 +42,7 @@ while (!stop){
 				}
 			}
 			#Now all the columns are the right type
-			#####################################################
+			######################################################
 			methDataByRep[[i]] <- methDataFrame
 			}
 		}
