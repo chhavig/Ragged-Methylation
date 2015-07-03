@@ -190,11 +190,11 @@ class Region:
 		self.methylationDict = self.getMethylationDict(replicateList, minCpGs)
 
 		#Each key is a biological replicate, and each value is the variance of the smoothed methylation levels in that replicate
-		self.withinRepVarSmoothDict = self.getWithinRepVar()
-		self.withinRepMeanVar = np.mean(self.withinRepVarSmoothDict.values())
+		#self.withinRepVarSmoothDict = self.getWithinRepVar()
+		#self.withinRepMeanVar = np.mean(self.withinRepVarSmoothDict.values())
 		#Each key is a CpG site, and each value is the variance of the methylation at that CpG site across replicates
-		self.betweenRepVarDict = self.getBetweenRepVar()
-		self.betweenRepMeanVar = np.mean(self.betweenRepVarDict.values())
+		#self.betweenRepVarDict = self.getBetweenRepVar()
+		#self.betweenRepMeanVar = np.mean(self.betweenRepVarDict.values())
 		self.regionNameDict = {"REGION_INFO":"%s %s %d %d" % (self.ID, self.chr, self.start, self.end), "STATUS":knownStatus}
 		self.methylationDict.update(self.regionNameDict)
 			
@@ -211,7 +211,7 @@ class Region:
 				print("There was a problem obtaining methylation data for this replicate. This replicate has not been included in the methylation data for this region.")
 				methylationDict = None
 		return methylationDict
-
+	'''
 	def getWithinRepVar(self):
 		if self.methylationDict == None:
 			return None
@@ -235,7 +235,7 @@ class Region:
 			varByCpGDict[pos] = np.std([cpgPosValDict[rep][pos] for rep in cpgPosValDict.keys()])**2
 
 		return varByCpGDict
-	
+	'''
 
 
 def getLineCheckLength(regionFileName, lineNumber, minRegionLength):
