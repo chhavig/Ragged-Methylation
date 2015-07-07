@@ -279,6 +279,11 @@ def getRegionDict(replicateList, numRandRegions, minCpGs, minRegionLength, regio
 				continue
 			else:
 				outRegionDict[lineList[3]] = Region(lineList[3], lineList[0], lineList[1], lineList[2], replicateList, knownStatus, minCpGs)
+
+				if outRegionDict[lineList[3]].methylationDict == None:
+					del outRegionDict[lineList[3]]
+					continue
+
 				cpgCheck = checkCpGNum(outRegionDict[lineList[3]].methylationDict, minCpGs)
 				if cpgCheck == None:
 					del outRegionDict[lineList[3]]
@@ -301,6 +306,11 @@ def getRegionDict(replicateList, numRandRegions, minCpGs, minRegionLength, regio
 				continue
 			else:
 				outRegionDict[lineList[3]] = Region(lineList[3], lineList[0], lineList[1], lineList[2], replicateList, knownStatus, minCpGs)
+
+				if outRegionDict[lineList[3]].methylationDict == None:
+					del outRegionDict[lineList[3]]
+					continue
+
 				cpgCheck = checkCpGNum(outRegionDict[lineList[3]].methylationDict, minCpGs)
 				if cpgCheck == None:
 					del outRegionDict[lineList[3]]
@@ -340,7 +350,7 @@ minRegionLength = int(sys.argv[6])
 chrDictByRep = {rep:{} for rep in bedgraphFilenames}
 
 print("Getting random regions")
-randRegionDict = getRegionDict(bedgraphFilenames, numRandRegions, minCpGs, minRegionLength, allRegionsFilename, 0)
+randRegionDict = getRegionDict(bedgraphFilenames, numRandRegions, minCpGs, minRegionLength, allRegionsFilename, -1)
 
 if knownRegionsFilename != "NONE":
 	print("Getting known regions")
