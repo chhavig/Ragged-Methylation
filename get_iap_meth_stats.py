@@ -197,7 +197,7 @@ class Region:
 		#self.betweenRepMeanVar = np.mean(self.betweenRepVarDict.values())
 		if self.methylationDict != None:
 			regionNameDict = {"REGION_INFO":"%s %s %d %d" % (self.ID, self.chr, self.start, self.end), "STATUS":knownStatus}
-			self.methylationDict.update(self.regionNameDict)
+			self.methylationDict.update(regionNameDict)
 			
 				
 	def getMethylationDict(self, replicateList, minCpGs):
