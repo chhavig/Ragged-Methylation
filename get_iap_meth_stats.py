@@ -195,8 +195,9 @@ class Region:
 		#Each key is a CpG site, and each value is the variance of the methylation at that CpG site across replicates
 		#self.betweenRepVarDict = self.getBetweenRepVar()
 		#self.betweenRepMeanVar = np.mean(self.betweenRepVarDict.values())
-		self.regionNameDict = {"REGION_INFO":"%s %s %d %d" % (self.ID, self.chr, self.start, self.end), "STATUS":knownStatus}
-		self.methylationDict.update(self.regionNameDict)
+		if self.methylationDict != None:
+			regionNameDict = {"REGION_INFO":"%s %s %d %d" % (self.ID, self.chr, self.start, self.end), "STATUS":knownStatus}
+			self.methylationDict.update(self.regionNameDict)
 			
 				
 	def getMethylationDict(self, replicateList, minCpGs):
