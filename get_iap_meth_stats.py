@@ -297,11 +297,10 @@ def getRegionDict(replicateList, numRandRegions, minCpGs, minRegionLength, regio
 	
 	else:
 		availableLines = range(1, totalNumRegions+1)
-		alreadyTried = []
 		while(len(outRegionDict.keys()) < numRandRegions):
 			randLineNumber = rand.choice(availableLines)
-			alreadyTried.append(randLineNumber)
-			availableLines = list(set(availableLines) - set(alreadyTried))
+			availableLines.remove(randLineNumber)
+			print("There are %d regions left to choose from." % len(availableLines))
 			lineList = getLineCheckLength(regionsFileName, randLineNumber, minRegionLength)
 			if lineList == None:
 				continue
