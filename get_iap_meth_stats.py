@@ -301,6 +301,11 @@ def getRegionDict(replicateList, numRandRegions, minCpGs, minRegionLength, regio
 			randLineNumber = rand.choice(availableLines)
 			availableLines.remove(randLineNumber)
 			print("There are %d regions left to choose from." % len(availableLines))
+
+			if len(availableLines) == 0:
+				print("There are no more allowed regions in the file. Stopping search.")
+				break
+
 			lineList = getLineCheckLength(regionsFileName, randLineNumber, minRegionLength)
 			if lineList == None:
 				continue
