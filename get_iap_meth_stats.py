@@ -207,6 +207,8 @@ class Region:
 			print("Getting data from replicate %s" % rep)
 			methList = getCpGs(self.chr, self.start, self.end, rep)
 			if methList != None:
+				print('Replicate: %s' % rep)
+				print(len(methList))
 				methylationDict[rep] = methList
 			else:
 				print("There was a problem obtaining methylation data for this replicate. This replicate has not been included in the methylation data for this region.")
