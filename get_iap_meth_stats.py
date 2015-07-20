@@ -211,6 +211,7 @@ class Region:
 			else:
 				print("There was a problem obtaining methylation data for this replicate. This region has not been included.")
 				return None
+		return methylationDict
 		
 	'''
 	def getWithinRepVar(self):
