@@ -1,20 +1,25 @@
+#argument 1: file name to save the variance data
+
 library(jsonlite)
 library(bsseq)
 
+args <- commandArgs(trailingOnly = TRUE)
+
 f <- file("stdin", "r")
 
+if(file.exists(args[1])){
+  file.remove(args[1])
+}
+
+lost=0
+cnt=0
 stop <- FALSE
 while (!stop){
   line <- readLines(f,n=1)
   if (length(line)>0){
     d <- fromJSON(line)
-#df <- stream_in(f)
-#print(df)
-
-#d=list()
-    #print(d)
-    
-    #while(!stop)
+cnt=cnt+1
+print(cnt)
     
     x<-names(d)
     #print(x)
@@ -24,12 +29,16 @@ while (!stop){
     status<-0
     for(i in names(d)){
       if(i=='REGION_INFO'){
-        region<-c(strsplit(x," "))
+        region<-d[[i]]
       }
+      
       else if (i=='STATUS'){
         status<-as.numeric(d[[i]])
       }
+      
       else{
+        
+        #saving all replicates methylation details in comp
         DF<-NULL
         #print(length(d[[i]]))
         for(j in 1:length(d[[i]])){
@@ -38,49 +47,43 @@ while (!stop){
         }
         
         colnames(DF) <- c('chr', 'start', 'end', 'score', 'M', 'U')
-        #print(DF)
-        #DF[,'start']<-as.numeric(DF[,'start'])
-        #print(DF[1,'start']+DF[2,'start'])
-        #print(DF)
-        #DF$end<-as.numeric(DF$end)
-        #DF$score<-as.numeric(DF$score)
-        #DF$M<-as.numeric(DF$M)
-        #DF$U<-as.numeric(DF$U)
-        #print (DF)
         comp[[i]]<-DF
       }
     }
     
-    #smoothing
+    print('Region:')
+    print(region)
+    words <- strsplit(region, " ")[[1]]
     
+    #print(length(comp))
     sum_var=0
-    #if(FALSE){
+    #loop 1, smoothing methylation data and calculating variance within replicates
+    if(length(comp)>0){
       for(i in 1:length(comp)){
         data<-comp[[i]]
-        #print(data)
         M <- matrix (as.numeric(data [,'M']), ncol=1 )
-        #print(M)
         Cov <- matrix (as.numeric(data [,'M'])+as.numeric(data [,'U']), ncol=1 )
-        #print(Cov)
         
         cover=as.numeric(data [,'M'])+ as.numeric(data [,'U'])
         sc=((as.numeric(data [,'M']))/(cover))*100
-        
+        if(!is.na(var(sc))){
+          
         if ((var(sc))==0)
         {
           df1<-data.frame(region,i,var(sc),var(sc))
           sum_var=sum_var+var(sc)
         }
-        
+          
         if ((var(sc))!=0) {
           
-          BStmp <- BSseq (chr = c(data[,'chr']), pos = as.numeric(data [,'start']), M=M, Cov=Cov)
-          BStemp<-BSmooth(BStmp, ns=10, h=300, maxGap=3000, keep.se=TRUE, verbose=FALSE)
-          
-          
-          print(summary(getMeth(BStemp)))
-          print(var(getMeth(BStemp)*100))
-          
+        BStmp <- BSseq (chr = c(data[,'chr']), pos = as.numeric(data [,'start']), M=M, Cov=Cov)
+        BStemp<-BSmooth(BStmp, ns=10, h=300, maxGap=3000, keep.se=TRUE, verbose=FALSE)
+        
+        #calculating regions lost when var is NA
+        if(is.na(var(getMeth(BStemp))))
+          lost=lost+1
+        
+        if(!is.na(var(getMeth(BStemp)))){
           if (((var(getMeth(BStemp)*100))/(var(sc)))>=1.45)
           {
             df1<-data.frame(region,i,var(sc),var(sc))
@@ -92,25 +95,19 @@ while (!stop){
             #sum_var=sum_var+var(df1[2])
             df1<-data.frame(region,i,var(sc),var(getMeth(BStemp)*100))
             sum_var=sum_var+var(getMeth(BStemp)*100)
+            data[,'score']<-(getMeth(BStemp)*100)
+            comp[[i]]<-data
           }
-          
         }
-        #write.table(df1, file = 'random.csv', append = TRUE, quote = TRUE, sep = " , ",
-        #            eol = "\n", na = "NA", dec = ".", row.names = FALSE,
-        #            col.names = FALSE, qmethod = c("escape", "double"),
-        #            fileEncoding = "")
+        }
+        }
       }
-    #}
-    
-    #for(i in 1:length(comp)){
-    #  df1<-comp[[i]]
-    #  sum_var=sum_var+var(df1[,'score'])
-    #}
-    
+
     df2<-comp[[1]]
-    print(df2)
+    #print(df2)
     num<-c()
     
+    #loop2, calculating variance across replicates
     for(j in 1:nrow(df2)){
       search=paste0(df2[j,'chr'],df2[j,'start'],' ')
       #print(search)
@@ -125,10 +122,8 @@ while (!stop){
         for(l in 1:nrow(df3)){
           chck=paste0(df3[l,'chr'],df3[l,'start'],' ')
           if(chck==search){
-            #print('Yep')
             present=TRUE
             n<-(df3[l,'score'])
-            #print(n)
             break;
           }
         }
@@ -138,45 +133,36 @@ while (!stop){
         }
         else{
           num1<-c(num1,n)
-          #print(num1)
         }
       }
       
       #print('Out here')
       
-      if(length(num1)==length(comp)){
-        num<-c(num,num1)
-        #print(num)
+      if(length(num1)>1){
+        va1<-var(num1) #variance across replicates for a CpG
+        num<-c(num,va1)
       }
-      #print(num)
     }
     
-    print(num)
-    
-    #print(sum_var)
-    print('Region:')
-    print((region))
+    #print(num)
     print('Result 1, mean of variance different replicates:')
     print(mean(sum_var))
     
-    get=matrix(c(num), nrow=3)
-    #print(get)
-    
-    va<-c()
-    
-    for(go in 1:ncol(get)){
-      va<-c(va,var(get[,go]))
+    if(!is.null(num)){
+      print('Result 2, mean of variance of different CpGs across replicates:')
+      print(mean(num))
+      dff<-data.frame(words[[1]],region,status,mean(sum_var),mean(num))
     }
     
-    print('Result 2, mean of variance of different CpGs across replicates:')
-    print(mean(va))
-    
-    df1<-data.frame(region,mean(sum_var),mean(va))
-    
-    write.table(df1, file = 'results.csv', append = TRUE, quote = TRUE, sep = " , ",
+    else{
+      print('Cant calculate Result 2')
+      dff<-data.frame(words[[1]],region,status,mean(sum_var),0)
+    }
+    write.table(dff, file = args[1], append = TRUE, quote = TRUE, sep = " , ",
                 eol = "\n", na = "NA", dec = ".", row.names = FALSE,
                 col.names = FALSE, qmethod = c("escape", "double"),
                 fileEncoding = "")
+    }
     
   } else {
     stop <- TRUE
@@ -184,10 +170,5 @@ while (!stop){
   }
 }
 
-#for (s in colnames(df)){
-	#s = colnames(df)[i]
-#	d[[s]] <- unlist(df[s][[1]][[1]])
-#}
-
-#print(comp)
-
+print("Regions lost:")
+print(lost)
