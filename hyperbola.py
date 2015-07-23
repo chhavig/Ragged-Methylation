@@ -12,6 +12,7 @@ import random
 unit_step = lambda x: 0 if x < 0 else 1
 
 training = open(sys.argv[1], 'r')
+#training=open('checked.bed','r')
 training_data=[]
 
 #getting training data
@@ -30,9 +31,10 @@ n = 500 #number of times random training values are considered
 rp=100 #number of times the whole code repeats
 
 if(os.path.isfile(sys.argv[2])):
+#if(os.path.isfile('best1.txt')):
   #taking best parameters if saved earlier
-  best=open('best1.txt', 'r+')
-  l=linecache.getline('best1.txt', 1).strip().split()
+  best=open(sys.argv[2], 'r+')
+  l=linecache.getline(sys.argv[2], 1).strip().split()
   minct=int(float(l[0]))
   bw=[float(l[1]),float(l[2])]
   w=bw
@@ -86,6 +88,7 @@ for num in range(rp):
 training.close()
 #best.truncate(0)
 if(os.path.isfile(sys.argv[2])):
+#if(os.path.isfile('best1.txt')):
   best.close()
 best=open(sys.argv[2], 'w')
 best.close()

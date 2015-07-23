@@ -1,7 +1,7 @@
 #Argument1: file with hyperbola parameters [best1.txt]
 #Argument2: methylation variance data of all random data points (has status 1, for all given by Anastasiya, and -1 for all others) [results_20_02.csv]
 #Argument3: methylation variance data of training data points (has status 1 for ragged, and -1 for non ragged) [checked.bed]
-#Argument4: file where it'll save all regions identified as ragged [regions.csv]
+#Argument4: file name to save all regions identified as ragged [regions.csv]
 
 args <- commandArgs(trailingOnly = TRUE)
 #conn <- file('best1.txt',open='r')
