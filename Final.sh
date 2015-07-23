@@ -1,3 +1,5 @@
+#install bsseq, jsonlite, e1071 in R before running
+
 #$1: get_iap_meth_stats.py: Python file giving out JSON
 #$2: iap_whole_genome.merged.filtered.bed: whole genome iap/erv regions file
 #$3: var_meth.bed: ragged regions validated by Anastasiya
