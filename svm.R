@@ -55,7 +55,7 @@ for(i in 1:length(svm.pred1)){
     svm.pred1[i]=-1
   else
     svm.pred1[i]=1
-  if(svm.pred1[i]==1)
+  if((svm.pred1[i]==1) && (data1[i,4]>1000) && (data1[i,5]>100))
   {
     df<-data.frame(data1[i,])
    #print(df)
