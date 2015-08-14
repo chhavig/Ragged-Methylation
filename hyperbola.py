@@ -22,7 +22,8 @@ for line in training.readlines():
   coord=array([line_list[3],line_list[4]])
   tupl=(coord,line_list[2])
   training_data.extend([tupl])
-  
+
+#w[] is x & y parameters in final equation, b is the constant  
 w = [0.0, 0.0] 
 b = 80000.0
 errors = []
@@ -30,6 +31,7 @@ eta = 100 #training speed
 n = 500 #number of times random training values are considered
 rp=100 #number of times the whole code repeats
 
+#bw, bb mean the best w[] and best b till now (pick from file or assume), minct is number of errors for best w, b
 if(os.path.isfile(sys.argv[2])):
 #if(os.path.isfile('best1.txt')):
   #taking best parameters if saved earlier
@@ -50,6 +52,7 @@ print(minct)
 print(bw)
 print(bb)
 
+#x[] is x & y coordinates of a single point, then equation (x-h)*(y-k)=c of rectangular hyperbola is used to calculate result
 for num in range(rp):
   for i in xrange(n):
     x, expected = choice(training_data)
