@@ -45,6 +45,15 @@ Temporary Items
 #Data files
 iap_whole_genome.merged.bed
 
+Rplots.pdf
+best1.txt
+IAP_regions_from_AK_08-2015.csv
+non-ragged_IAPs_AK_08-2015.bed
+result_20_02.csv
+regions.csv
+ragged_IAPs_AK_08-2015.bed
+
+
 #Temporary files created by gedit
 get_iap_meth_stats.py~
 stdin_json.R~
